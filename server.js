@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
@@ -31,7 +31,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     console.log('Prompt:', req.body.prompt);
 
     // Read the file as base64
-    const imageBuffer = await readFile(req.file.path);
+    const imageBuffer = await readFile(req.file.buffer);
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype;
     
@@ -95,18 +95,10 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       }
     } catch (error) {
       console.error('Detailed error:', error);
-      await unlink(req.file.path);
       res.status(500).json({ error: error.message || 'Error processing image' });
     }
   } catch (error) {
     console.error('Detailed error:', error);
-    if (req.file) {
-      try {
-        await unlink(req.file.path);
-      } catch (unlinkError) {
-        console.error('Error deleting uploaded file:', unlinkError);
-      }
-    }
     res.status(500).json({ error: error.message || 'Error processing image' });
   }
 });
