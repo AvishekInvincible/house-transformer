@@ -16,7 +16,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
-console.log('Replicate API Token:', process.env.REPLICATE_API_TOKEN);
 app.use(express.static('public'));
 
 let styleHistory = [];
@@ -86,10 +85,21 @@ app.post('/upload', upload.single('image'), async (req, res) => {
           originalPrompt: prompt
         });
       } else {
-        console.log('Direct output:', output);
+        console.log('Raw API response:', output);
+
+        // Check if the output is a valid JSON
+        let jsonResponse;
+        try {
+          jsonResponse = JSON.parse(output);
+        } catch (parseError) {
+          console.error('Response is not valid JSON:', parseError);
+          return res.status(500).json({ error: 'Invalid response format from API' });
+        }
+
+        // Use the parsed JSON response
         res.json({ 
           success: true,
-          imageUrl: output,
+          imageUrl: jsonResponse,
           originalPrompt: prompt
         });
       }
