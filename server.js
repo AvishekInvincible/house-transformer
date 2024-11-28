@@ -16,7 +16,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
-
+console.log('Replicate API Token:', process.env.REPLICATE_API_TOKEN);
 app.use(express.static('public'));
 
 let styleHistory = [];
@@ -26,7 +26,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
     }
-
+ 
     console.log('File received:', req.file);
     console.log('Prompt:', req.body.prompt);
 
