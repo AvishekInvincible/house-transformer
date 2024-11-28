@@ -42,21 +42,58 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
     try {
       console.log('Sending request to Replicate... WORKING');
-      // Run the model
-      const output = await replicate.run("black-forest-labs/flux-canny-pro", { input: {
-        steps: 28,
-        prompt: req.body.prompt || "a photo of a house in a different style",
-        guidance: 25,
-        control_image: dataUrl
-      }});
-
-      // Save the output to a file in the /tmp directory
-      const outputPath = path.join('/tmp', 'output.jpg');
-      await writeFile(outputPath, output);
-      console.log('Output saved to', outputPath);
-
-      // Send the output file as a response
-      res.sendFile(outputPath);
+      const output = await replicate.run(
+        "black-forest-labs/flux-canny-pro",
+        {
+          input: {
+            control_image: dataUrl,
+            prompt: prompt,
+            steps: 50,
+            guidance: 25
+          }
+        }
+      );
+      console.log(' request from Replicate... RECIEVED',output);
+      // Check if the output is a valid JSON or a direct response
+      if (typeof output === 'string') {
+        console.log('API response (string):', output);
+        res.json({
+          success: true,
+          apiResponse: output
+        });
+      } else if (output instanceof ReadableStream) {
+        const reader = output.getReader();
+        
+        const chunks = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          console.log('API response (ReadableStream):', value);
+        }
+        
+        // Combine all chunks into a single Uint8Array
+        const concatenated = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+        let offset = 0;
+        for (const chunk of chunks) {
+          concatenated.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        // Convert to base64
+        const base64 = Buffer.from(concatenated).toString('base64');
+        const imageUrl = `data:image/jpeg;base64,${base64}`;
+        
+        console.log('Generated image URL (base64)',imageUrl);
+        
+        // Send JSON response with the image URL and API response
+        res.json({
+          success: true,
+          imageUrl: imageUrl,
+          apiResponse: output
+        });
+      }
     } catch (error) {
       console.error('Detailed error:', error);
       res.status(500).json({ error: error.message || 'Error processing image' });
