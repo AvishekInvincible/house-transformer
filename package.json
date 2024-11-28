@@ -1,0 +1,23 @@
+{
+  "name": "house-style-transformer",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Transform house images into different architectural styles using AI",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1",
+    "replicate": "^1.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

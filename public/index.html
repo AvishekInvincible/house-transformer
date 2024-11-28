@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Style Transformer 🏠✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        body {
+            background: #111827;
+            min-height: 100vh;
+            padding: 1rem;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+            padding: 0 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(45deg, #1f2937, #374151, #1f2937);
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            line-height: 1.4;
+            padding: 0 1rem;
+        }
+
+        .upload-container {
+            background: #1f2937;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+            border: 1px solid #374151;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e5e7eb;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            background: #374151;
+            border: 2px solid #4b5563;
+            border-radius: 6px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #60a5fa;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
+        }
+
+        .file-upload {
+            border: 2px dashed #4b5563;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #374151;
+        }
+
+        .file-upload p {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            line-height: 1.4;
+        }
+
+        .file-upload:hover {
+            border-color: #60a5fa;
+            transform: scale(1.01);
+        }
+
+        .file-upload.dragover {
+            border-color: #60a5fa;
+            background: #2563eb;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .images-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .image-box {
+            background: #1f2937;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border: 1px solid #374151;
+            transition: all 0.3s;
+        }
+
+        .image-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-box h3 {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-bottom: 0.75rem;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .image-box img:hover {
+            transform: scale(1.02);
+        }
+
+        .image-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .action-button {
+            padding: 0.5rem;
+            font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+        }
+
+        .action-button:hover {
+            background: #4b5563;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: #1f2937;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .loading.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #374151;
+            border-top: 4px solid #60a5fa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .error {
+            color: #ef4444;
+            padding: 1rem;
+            background: #1f2937;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            margin-top: 1rem;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: #9ca3af;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            border-top: 1px solid #374151;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .header {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .upload-container {
+                padding: 1rem;
+            }
+
+            .file-upload {
+                padding: 1rem;
+            }
+
+            .image-box {
+                padding: 1rem;
+            }
+
+            .image-box img {
+                height: 200px;
+            }
+
+            .image-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .action-button {
+                padding: 0.75rem;
+            }
+        }
+
+        .style-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .preset-btn {
+            background: #374151;
+            border: 1px solid #4b5563;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            margin: 1rem 0;
+        }
+
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #60a5fa;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+
+        .progress-container {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background: #374151;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: #60a5fa;
+            transition: width 0.3s ease;
+        }
+
+        .progress-steps {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        .step {
+            width: 25%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .step.active {
+            background: #60a5fa;
+            color: #fff;
+        }
+
+        .theme-toggle {
+            margin-top: 1rem;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .settings-toggle {
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .download-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .download-btn {
+            padding: 0.5rem 1rem;
+            background: #2563eb;
+            border: none;
+            border-radius: 0.25rem;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+
+        .advanced-settings {
+            margin-top: 1rem;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .settings-toggle {
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .download-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .download-btn {
+            padding: 0.5rem 1rem;
+            background: #2563eb;
+            border: none;
+            border-radius: 0.25rem;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>House Style Transformer 🏠✨</h1>
+            <p class="subtitle">Transform your house into different architectural styles using AI magic ✨</p>
+            <div class="theme-toggle">
+                <button id="themeToggle" aria-label="Toggle theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24">
+                        <path d="M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24">
+                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="upload-container">
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="prompt">Style Description 🎨</label>
+                    <input type="text" id="prompt" name="prompt" 
+                           placeholder="e.g., 'a modern minimalist house', 'a cozy cottage', 'a futuristic mansion'" required>
+                </div>
+
+                <div class="style-presets">
+                    <button type="button" class="preset-btn" data-style="modern minimalist villa with clean lines and large windows">
+                        🏛️ Modern Minimalist
+                    </button>
+                    <button type="button" class="preset-btn" data-style="cozy cottage with rustic features and natural materials">
+                        🏡 Cozy Cottage
+                    </button>
+                    <button type="button" class="preset-btn" data-style="futuristic smart home with sleek design and innovative features">
+                        🚀 Futuristic
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <div class="file-upload" id="dropZone">
+                        <input type="file" id="image" name="image" accept="image/*" required>
+                        <p>📸 Drop your house image here or click to upload</p>
+                        <p style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.5rem;">Supported formats: JPG, PNG</p>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn">✨ Transform Image</button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>🎨 Working some AI magic... This may take a minute.</p>
+        </div>
+
+        
+
+        <div class="error" id="error"></div>
+
+        <div class="images-container">
+            <div class="image-box">
+                <h3>📸 Original Image</h3>
+                <img id="originalImage" style="display: none;">
+                <div class="image-actions">
+                    <button class="action-button" id="changeOriginal">
+                        🔄 Change Image
+                    </button>
+                </div>
+            </div>
+            <div class="image-box">
+                <h3>✨ Transformed Image</h3>
+                <img id="transformedImage" style="display: none;">
+                <div class="image-actions">
+                    <button class="action-button" id="downloadTransformed">
+                        💾 Download
+                    </button>
+                    <button class="action-button" id="regenerate">
+                        🔄 Regenerate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Created with 💖 by AVISHEK | Powered by AI ✨
+        </div>
+
+        <div class="advanced-settings">
+            <button id="settingsToggle" class="settings-toggle">
+                ⚙️ Advanced Settings
+            </button>
+            <div class="settings-panel" hidden>
+                <div class="setting-group">
+                    <label for="steps">Steps:</label>
+                    <input type="range" id="steps" name="steps" min="20" max="50" value="28">
+                    <span class="value-display">28</span>
+                </div>
+                <div class="setting-group">
+                    <label for="guidance">Guidance Scale:</label>
+                    <input type="range" id="guidance" name="guidance" min="1" max="50" value="25">
+                    <span class="value-display">25</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const originalImage = document.getElementById('originalImage');
+        const transformedImage = document.getElementById('transformedImage');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('image');
+        const submitBtn = document.getElementById('submitBtn');
+        const downloadBtn = document.getElementById('downloadTransformed');
+        const changeOriginalBtn = document.getElementById('changeOriginal');
+        const regenerateBtn = document.getElementById('regenerate');
+
+        // Handle drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
+            if (fileInput.files[0]) {
+                showOriginalImage(fileInput.files[0]);
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                showOriginalImage(fileInput.files[0]);
+            }
+        });
+
+        function showOriginalImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImage.src = e.target.result;
+                originalImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Download transformed image
+        downloadBtn.addEventListener('click', async () => {
+            if (transformedImage.src) {
+                try {
+                    const response = await fetch(transformedImage.src);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'transformed-house.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } catch (err) {
+                    console.error('Error downloading image:', err);
+                    error.textContent = 'Error downloading image';
+                    error.style.display = 'block';
+                }
+            }
+        });
+
+        // Change original image
+        changeOriginalBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Regenerate transformed image
+        regenerateBtn.addEventListener('click', () => {
+            if (fileInput.files[0]) {
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('prompt').value = btn.dataset.style;
+            });
+        });
+
+        function initComparisonSlider() {
+            const slider = document.querySelector('.comparison-slider');
+            const handle = slider.querySelector('.slider-handle');
+            let isResizing = false;
+
+            handle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', () => {
+                    isResizing = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                });
+            });
+
+            function onMouseMove(e) {
+                if (!isResizing) return;
+                const sliderRect = slider.getBoundingClientRect();
+                const position = (e.pageX - sliderRect.left) / sliderRect.width;
+                handle.style.left = `${position * 100}%`;
+                transformedImage.style.clipPath = `inset(0 0 0 ${position * 100}%)`;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            error.style.display = 'none';
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+            transformedImage.style.display = 'none';
+            downloadBtn.disabled = true;
+            regenerateBtn.disabled = true;
+
+            const formData = new FormData(form);
+
+            try {
+                console.log('Sending request...');
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Full server response:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to transform image');
+                }
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.imageUrl) {
+                    console.log('Received image URL type:', typeof data.imageUrl);
+                    console.log('Received image URL:', data.imageUrl);
+                    console.log('Setting image URL:', data.imageUrl);
+                    transformedImage.src = data.imageUrl;
+                    transformedImage.style.display = 'block';
+                    downloadBtn.disabled = false;
+                    regenerateBtn.disabled = false;
+                } else {
+                    throw new Error('No image URL received');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                error.textContent = err.message;
+                error.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function addDownloadOptions() {
+            const downloadOptions = document.createElement('div');
+            downloadOptions.className = 'download-options';
+            downloadOptions.innerHTML = `
+                <button class="download-btn" data-format="jpg">Download JPG</button>
+                <button class="download-btn" data-format="png">Download PNG</button>
+                <button class="download-btn" data-format="webp">Download WebP</button>
+            `;
+            
+            downloadOptions.addEventListener('click', async (e) => {
+                if (!e.target.matches('.download-btn')) return;
+                
+                const format = e.target.dataset.format;
+                const imageUrl = transformedImage.src;
+                
+                try {
+                    const response = await fetch(imageUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `transformed-house.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } catch (error) {
+                    console.error('Download error:', error);
+                }
+            });
+            
+            transformedImage.parentNode.insertBefore(downloadOptions, transformedImage.nextSibling);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+
+            // Advanced settings
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsPanel = document.querySelector('.settings-panel');
+            settingsToggle.addEventListener('click', () => {
+                settingsPanel.hidden = !settingsPanel.hidden;
+            });
+
+            // Range input displays
+            document.querySelectorAll('input[type="range"]').forEach(input => {
+                const display = input.nextElementSibling;
+                input.addEventListener('input', () => {
+                    display.textContent = input.value;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
