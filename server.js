@@ -30,8 +30,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     console.log('File received:', req.file);
     console.log('Prompt:', req.body.prompt);
 
-    // Read the file as base64
-    const imageBuffer = await readFile(req.file.buffer);
+    // Use the buffer directly
+    const imageBuffer = req.file.buffer;
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype;
     
