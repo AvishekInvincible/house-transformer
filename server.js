@@ -41,7 +41,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     console.log('Data URL length:', dataUrl.length);
 
     try {
-      console.log('Sending request to Replicate...');
+      console.log('Sending request to Replicate... WORKING');
       const output = await replicate.run(
         "black-forest-labs/flux-canny-pro",
         {
@@ -53,7 +53,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
           }
         }
       );
-
+      console.log('Sending request to Replicate... RECIEVED',output);
       // Check if the output is a valid JSON or a direct response
       if (typeof output === 'string') {
         console.log('API response (string):', output);
