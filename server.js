@@ -25,7 +25,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
     }
- 
+
     console.log('File received:', req.file);
     console.log('Prompt:', req.body.prompt);
 
@@ -42,56 +42,75 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
     try {
       console.log('Sending request to Replicate... WORKING');
-      const output = await replicate.run(
-        "black-forest-labs/flux-canny-pro",
-        {
-          input: {
-            control_image: dataUrl,
-            prompt: prompt,
-            steps: 50,
-            guidance: 25
+      let output;
+      try {
+        output = await replicate.run(
+          "black-forest-labs/flux-canny-pro",
+          {
+            input: {
+              control_image: dataUrl,
+              prompt: prompt,
+              steps: 50,
+              guidance: 25
+            }
           }
+        );
+        console.log('Request from Replicate... RECEIVED', output);
+
+        // Validate the output
+        if (!output) {
+          throw new Error('No output received from Replicate API');
         }
-      );
-      console.log(' request from Replicate... RECIEVED',output);
-      // Check if the output is a valid JSON or a direct response
-      if (typeof output === 'string') {
-        console.log('API response (string):', output);
-        res.json({
-          success: true,
-          apiResponse: output
-        });
-      } else if (output instanceof ReadableStream) {
-        const reader = output.getReader();
-        
-        const chunks = [];
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          console.log('API response (ReadableStream):', value);
+
+        // If output is a string (direct image URL)
+        if (typeof output === 'string') {
+          res.json({
+            success: true,
+            imageUrl: output
+          });
+        } 
+        // If output is a ReadableStream
+        else if (output instanceof ReadableStream) {
+          const reader = output.getReader();
+          const chunks = [];
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+          }
+          
+          // Combine chunks into a single Uint8Array
+          const concatenated = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+          let offset = 0;
+          for (const chunk of chunks) {
+            concatenated.set(chunk, offset);
+            offset += chunk.length;
+          }
+          
+          const base64 = Buffer.from(concatenated).toString('base64');
+          const imageUrl = `data:image/jpeg;base64,${base64}`;
+          
+          res.json({
+            success: true,
+            imageUrl: imageUrl
+          });
         }
-        
-        // Combine all chunks into a single Uint8Array
-        const concatenated = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
-        let offset = 0;
-        for (const chunk of chunks) {
-          concatenated.set(chunk, offset);
-          offset += chunk.length;
+        // If output is something else (like an object with image URL)
+        else if (output && typeof output === 'object') {
+          res.json({
+            success: true,
+            imageUrl: output.url || output.image || output
+          });
         }
-        
-        // Convert to base64
-        const base64 = Buffer.from(concatenated).toString('base64');
-        const imageUrl = `data:image/jpeg;base64,${base64}`;
-        
-        console.log('Generated image URL (base64)',imageUrl);
-        
-        // Send JSON response with the image URL and API response
-        res.json({
-          success: true,
-          imageUrl: imageUrl,
-          apiResponse: output
+        else {
+          throw new Error('Unexpected output format from Replicate API');
+        }
+      } catch (error) {
+        console.error('Replicate API Error:', error);
+        res.status(500).json({ 
+          success: false,
+          error: 'Error processing image with Replicate API: ' + (error.message || 'Unknown error')
         });
       }
     } catch (error) {
