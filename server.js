@@ -54,8 +54,11 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         }
       );
 
-      // Handle the stream response
-      if (output instanceof ReadableStream) {
+      // Check if the output is a valid JSON or a direct response
+      if (typeof output === 'string') {
+        console.log('API response (string):', output);
+        res.send(`<h1>API Response</h1><pre>${output}</pre>`);
+      } else if (output instanceof ReadableStream) {
         const reader = output.getReader();
         const chunks = [];
         
@@ -79,29 +82,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         
         console.log('Generated image URL (base64)');
         
-        res.json({ 
-          success: true,
-          imageUrl: imageUrl,
-          originalPrompt: prompt
-        });
-      } else {
-        console.log('Raw API response:', output);
-
-        // Check if the output is a valid JSON
-        let jsonResponse;
-        try {
-          jsonResponse = JSON.parse(output);
-        } catch (parseError) {
-          console.error('Response is not valid JSON:', parseError);
-          return res.status(500).json({ error: 'Invalid response format from API' });
-        }
-
-        // Use the parsed JSON response
-        res.json({ 
-          success: true,
-          imageUrl: jsonResponse,
-          originalPrompt: prompt
-        });
+        res.send(`<h1>Generated Image</h1><img src="${imageUrl}" alt="Generated Image" />`);
       }
     } catch (error) {
       console.error('Detailed error:', error);
