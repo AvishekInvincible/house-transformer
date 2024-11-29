@@ -45,7 +45,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
       let output;
       try {
         output = await replicate.run(
-          "black-forest-labs/flux-canny-pro:c11bac58203ad24e54f5039f8c876c18e0edcd44a45dba343a82e69fea61a7d8",
+          "black-forest-labs/flux-canny-pro",
           {
             input: {
               control_image: dataUrl,
